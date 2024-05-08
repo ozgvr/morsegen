@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Morse Code Blinker</title>
+    <style>
+        body {
+            background-color: black; /* Default background color set to black */
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: gray;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <input id="morseText"></input>
+    <button id="startButton">Start</button>
+    <button id="stopButton" disabled>Stop</button>
+
+    <script>
+        // Morse code mapping
+        const morseCode = {
+            'A': '.-',    'B': '-...',  'C': '-.-.',  'D': '-..',
+            'E': '.',     'F': '..-.',  'G': '--.',   'H': '....',
+            'I': '..',    'J': '.---',  'K': '-.-',   'L': '.-..',
+            'M': '--',    'N': '-.',    'O': '---',   'P': '.--.',
+            'Q': '--.-',  'R': '.-.',   'S': '...',   'T': '-',
+            'U': '..-',   'V': '...-',  'W': '.--',   'X': '-..-',
+            'Y': '-.--',  'Z': '--..',
+            '1': '.----', '2': '..---', '3': '...--', '4': '....-',
+            '5': '.....', '6': '-....', '7': '--...', '8': '---..',
+            '9': '----.', '0': '-----',
+            ' ': '/' // Use '/' as the space marker
+        };
+
+        // Adjustable timings in milliseconds
+        const unitTime = 300;
+        const dotLength = 1 * unitTime;       // Length of a dot
+        const dashLength = 3 * unitTime;      // Length of a dash
+        const interSymbolGap = 1 * unitTime; // Gap between elements of a letter
+        const interLetterGap = 3 * unitTime;  // Gap between letters
+        const interWordGap = 7 * unitTime;    // Gap between words
+
+        let timeouts = [];
+
+        // Convert text to Morse code
+        function textToMorse(text) {
+            return text.toUpperCase().split('').map(char => morseCode[char] || '').join(' ');
+        }
+
+        // Perform the blinks
+        function blinkMorse(morseCode) {
+            let currentTime = 0;
+            for (let char of morseCode) {
+                if (char === '.') {
+                    timeouts.push(setTimeout(() => document.body.style.backgroundColor = 'white', currentTime));
+                    timeouts.push(setTimeout(() => document.body.style.backgroundColor = 'black', currentTime + dotLength));
+                    currentTime += dotLength + interSymbolGap;
+                } else if (char === '-') {
+                    timeouts.push(setTimeout(() => document.body.style.backgroundColor = 'white', currentTime));
+                    timeouts.push(setTimeout(() => document.body.style.backgroundColor = 'black', currentTime + dashLength));
+                    currentTime += dashLength + interSymbolGap;
+                } else if (char === ' ') {
+                    currentTime += interLetterGap;
+                } else if (char === '/') {
+                    currentTime += interWordGap;
+                }
+            }
+        }
+
+        // Clear all timeouts
+        function stopBlinking() {
+            timeouts.forEach(timeout => clearTimeout(timeout));
+            timeouts = [];
+            document.body.style.backgroundColor = 'black'; // Reset to black
+        }
+
+        document.getElementById('startButton').onclick = function() {
+            stopBlinking();
+            const inputText = document.getElementById('morseText').value;
+            const morse = textToMorse(inputText);
+            blinkMorse(morse);
+        };
+
+        document.getElementById('stopButton').onclick = function() {
+            stopBlinking();
+        };
+    </script>
+</body>
+</html>

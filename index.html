@@ -25,11 +25,14 @@
     </style>
 </head>
 <body>
-    <input id="morseText"></input>
-    <button id="startButton">Start</button>
-    <button id="stopButton" disabled>Stop</button>
-
+    <input id="unitTimeInput" type="number" placeholder="Unit Time"></input>
+    <input id="morseText" type="text" placeholder="Message"></input>
+    <div style="display: flex;">
+        <button id="startButton" style="margin-right: 10px;">Start</button>
+        <button id="stopButton">Stop</button>
+    </div>
     <script>
+        let unitTime = 300; // Default unit time
         // Morse code mapping
         const morseCode = {
             'A': '.-',    'B': '-...',  'C': '-.-.',  'D': '-..',
@@ -45,23 +48,21 @@
             ' ': '/' // Use '/' as the space marker
         };
 
-        // Adjustable timings in milliseconds
-        const unitTime = 300;
-        const dotLength = 1 * unitTime;       // Length of a dot
-        const dashLength = 3 * unitTime;      // Length of a dash
-        const interSymbolGap = 1 * unitTime; // Gap between elements of a letter
-        const interLetterGap = 3 * unitTime;  // Gap between letters
-        const interWordGap = 7 * unitTime;    // Gap between words
-
         let timeouts = [];
-
+        
         // Convert text to Morse code
         function textToMorse(text) {
             return text.toUpperCase().split('').map(char => morseCode[char] || '').join(' ');
         }
-
+        
         // Perform the blinks
         function blinkMorse(morseCode) {
+            const dotLength = 1 * unitTime;       // Length of a dot
+            const dashLength = 3 * unitTime;      // Length of a dash
+            const interSymbolGap = 1 * unitTime; // Gap between elements of a letter
+            const interLetterGap = 3 * unitTime;  // Gap between letters
+            const interWordGap = 7 * unitTime;    // Gap between words
+
             let currentTime = 0;
             for (let char of morseCode) {
                 if (char === '.') {
@@ -89,8 +90,9 @@
 
         document.getElementById('startButton').onclick = function() {
             stopBlinking();
-            const inputText = document.getElementById('morseText').value;
+            inputText = document.getElementById('morseText').value;
             const morse = textToMorse(inputText);
+            unitTime = document.getElementById('unitTimeInput').value;
             blinkMorse(morse);
         };
 
